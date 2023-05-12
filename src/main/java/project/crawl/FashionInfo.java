@@ -14,15 +14,14 @@ public class FashionInfo {
 	
 	public void getFashionInfoUpdateCheck() throws IOException{
 	
-		Document doc = Jsoup.connect("https://www.musinsa.com/mz/streetsnap?_mon=&gender=&p=1#listStart").get();
+		Document doc = Jsoup.connect("http://192.168.0.46:3000/notice/write").get();
 		
 		//스타일 첫페이지 검색해서 첫번째 사진의 날짜데이터만 가져옴.
 		//날짜가 현재 DB에 있는 최신 데이터 날짜랑 같다면 크롤링 해서 DB에 값을 넣을 필요가 없음.
 		//최신 날짜 가져오는 service랑 mapper 로직 추가 필요
 		
-		Elements e1 = doc.getElementsByAttributeValue("class","date");
-		Element e2 = e1.get(0);
-		System.out.println(e2.text());
+
+		System.out.println(doc.text());
 		
 	}
 	

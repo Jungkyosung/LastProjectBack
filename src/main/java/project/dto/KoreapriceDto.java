@@ -8,4 +8,5 @@ public class KoreapriceDto {
 	int koreapriceIdx;			//한국물가상품인덱스
 	String koreapriceProduct;	//상품명
 	double koreapricePrice;		//상품가격
+	String koreapriceCapacity;  //물가용량
 }
