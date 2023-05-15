@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.mapper.ProjectMapper">
+
+	<!-- 어디까지 리스트 조회 -->
+	<select id="selectTriedList" resultType="project.dto.TriedDto">
+		select tried_idx,
+		user_id, tried_title, tried_content, tried_img, tried_cnt, tried_rcmd,
+		date_format(tried_created_time, '%Y-%m-%d %H:%i:%s') as tried_created_time
+		from tried
+		where tried_deleted = 'N'
+		order by tried_idx desc
+	</select>
+
+	<!-- 어디까지 글쓰기 -->
+	<insert id="insertTried" parameterType="project.dto.TriedDto">
+		insert into tried
+		(tried_title, tried_img, tried_content, tried_created_time, user_id, tried_category_idx)
+		values ( #{triedTitle}, #{triedImg}, #{triedContent}, now(), 'admin', #{triedCategoryIdx})
+	</insert>
+
+	<!-- 어디까지 '최신순' 리스트 조회 -->
+	<select id="selectTriedRecent"
+		parameterType="project.dto.TriedDto" resultType="project.dto.TriedDto">
+		<![CDATA[
+		select * from tried 
+		where tried_category_idx=#{triedCategoryIdx} 
+		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
+		order by tried_created_time desc limit #{pages}, 10
+		]]>
+	</select>
+
+	<!-- 어디까지 '조회순' 리스트 조회 -->
+	<select id="selectTriedCount"
+		parameterType="project.dto.TriedDto" resultType="project.dto.TriedDto">
+		<![CDATA[
+		select * from tried 
+		where tried_category_idx=#{triedCategoryIdx} 
+		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
+		order by tried_cnt desc limit #{pages}, 10
+		]]>
+	</select>
+
+	<!-- 어디까지 '추천순' 리스트 조회 -->
+	<select id="selectTriedRecommend"
+		parameterType="project.dto.TriedDto" resultType="project.dto.TriedDto">
+		<![CDATA[
+		select * from tried 
+		where tried_category_idx=#{triedCategoryIdx} 
+		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
+		order by tried_rcmd desc limit #{pages}, 10
+		]]>
+	</select>
+
+	<!-- 어디까지 '조회수' -->
+	<update id="triedCnt" parameterType="int">
+		update tried
+		set tried_cnt = tried_cnt + 1
+		where tried_idx = #{triedIdx}
+	</update>
+
+	<!-- 어디까지 상세페이지 조회 -->
+	<select id="selectTriedDetail" parameterType="int"
+		resultType="project.dto.TriedDto">
+		select tried_idx, user_id, tried_title, tried_content,
+		tried_img,
+		date_format(tried_created_time, '%Y-%m-%d %H:%i:%s') as tried_created_time,
+		tried_cnt, tried_rcmd, tried_deleted
+		from tried
+		where tried_deleted = 'N' and tried_idx = #{triedIdx}
+	</select>
+
+	<!-- 어디까지 글쓰기 수정 -->
+	<update id="updateTried" parameterType="project.dto.TriedDto">
+		update tried
+		set tried_title = #{triedTitle},
+		tried_img = #{triedImg},
+		tried_content = #{triedContent},
+		tried_created_time = now(),
+		user_id = 'admin'
+		where tried_idx = #{triedIdx}
+	</update>
+
+	<!-- 어디까지 글쓰기 삭제 -->
+	<delete id="deleteTried" parameterType="int">
+		update tried
+		set tried_deleted = 'Y',
+		tried_created_time = now()
+		where tried_idx = #{triedIdx}
+	</delete>
+	
+	<!-- 어디까지 이미지 업로드 -->
+	<insert id="uploadTried">
+		insert into tried
+		(tried_img)
+		values (#{triedImg})
+	</insert>
+	
+</mapper>
