@@ -3,13 +3,13 @@
 
 <mapper namespace="project.mapper.LoginMapper">
 	<select id="login" parameterType="project.dto.UserDto" resultType="project.dto.UserDto">
-		select user_id, user_name, user_nickname, user_pw
+		select user_id, user_name, user_nickname, user_pw, country_idx
 		  from user
 		 where user_id = #{userId} and user_pw = #{userPw}
 	</select>
 
 	<select id="selectUserByUserId" parameterType="String" resultType="project.dto.UserDto">
-		select user_id, user_pw, user_name, user_nickname 
+		select user_id, user_pw, user_name, user_nickname, country_idx
 		  from user
 		 where user_id = #{userId}
 	</select>

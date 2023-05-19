@@ -29,11 +29,16 @@ public interface ChatMapper {
 	//채팅방_유저 테이블에 유저아이디, 채팅방ID 추가
 	public void insertUserIdToChatroomUser(ChatroomUserDto chatroomUserDto) throws Exception;
 	
-	//
-	public String selectLeaveTime(ChatDto chatDto) throws Exception;
-	
 	//등록한 채팅방 삭제(퇴장)
-	public void deleteChatroom(ChatroomUserDto chatroomUserDto) throws Exception;
+	public int deleteChatroom(ChatroomUserDto chatroomUserDto) throws Exception;
+	
+	//안읽은 메시지 개수 조회
+	//마지막 채팅 조회
+	public String selectLastMsgTime(ChatDto chatDto) throws Exception;
+	
+	//안읽은 메시지 개수
+	public int selectUnreadMsgCnt(ChatDto chatDto) throws Exception;
+	
 	
 	//1.글로벌 채팅 입력/조회(최근 채팅 10개)
 	public List<ChatDto> selectMessage(int num) throws Exception;

@@ -35,7 +35,7 @@ public class Exchange {
 	private KoreapriceMapper mapper;
 	
 	//매일 체크해서 환율 API 정보 가져와야 함
-	@Scheduled(cron= " 0 5 17 * * *")
+	@Scheduled(cron= " 0 0 9-18 * * *")
 	public void getExchangeData() throws JSONException, Exception {
 	
 		try {

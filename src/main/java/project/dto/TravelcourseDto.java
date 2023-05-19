@@ -1,5 +1,7 @@
 package project.dto;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -12,5 +14,7 @@ public class TravelcourseDto {
 	private String travelcourseDeleted;			//삭제여부
 	private String userId;						//유저아이디(외래키)
 	private String travelcourseTitle; 			//여행코스제목
-	private String travelcourseContents;		//여행코스내용
+	private String travelcourseStartDate;		//여행 시작일
+	private String travelcourseEndDate;         //여행 끝일
+	private List<TravelcourseDetailListDto> travelcourseDetailListDto; //여행코스 일정 세부내역
 }

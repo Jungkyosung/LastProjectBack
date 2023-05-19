@@ -42,7 +42,8 @@ public class JwtTokenUtil {
 		Instant now = Instant.now();
 		String jwtToken = Jwts.builder()
 				.claim("nickname", userDto.getUserNickname())   //토큰생성시 claim에 넣을 키와 값 지정.
-				.claim("name", userDto.getUserName())
+				.claim("name", userDto.getUserName())			//유저이름
+				.claim("countryIdx", userDto.getCountryIdx())	//유저 국가IDX
 				.setSubject(userDto.getUserId())				//해당 토큰이 발급되는 주체지정.
 				.setId(UUID.randomUUID().toString())	//jwt토큰에 UUID(고유값)으로 지정.
 				.setIssuedAt(Date.from(now))			//발행시간(현재)
