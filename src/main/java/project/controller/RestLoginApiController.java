@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import project.dto.GoogleDto;
@@ -32,6 +34,28 @@ public class RestLoginApiController {
 		}
 	}
 	
+	@GetMapping("/api/idduplicatecheck")
+	public ResponseEntity<String> idDuplicateCheck(@RequestParam("userId") String userId) throws Exception{
+		String checkUserId = loginService.idDuplicateCheck(userId);
+		if ( checkUserId != null ) {
+			return ResponseEntity.status(HttpStatus.OK).body("중복아이디가 있습니다.");
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body("중복아이디가 없습니다.");
+		}
+	}
+	
+	
+	@GetMapping("/api/nicknameduplicatecheck")
+	public ResponseEntity<String> nicknameDuplicateCheck(@RequestParam("userNickname") String userNickname) throws Exception{
+		String checkUserNickname = loginService.nicknameDuplicateCheck(userNickname);
+		if ( checkUserNickname != null ) {
+			return ResponseEntity.status(HttpStatus.OK).body("중복닉네임이 있습니다.");
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body("중복닉네임이 없습니다.");
+		}
+	}
+	
+	
 	//구글 로그인 시 처리
 	//axios 날라옴 만약 회원정보가 있다면 1 응답
 	//회원정보가 없다면 0 응답.
@@ -48,9 +72,9 @@ public class RestLoginApiController {
 		} else {
 			return ResponseEntity.status(HttpStatus.OK).body(userCheck.size());
 		}
-		
-		
 	}
+	
+
 	
 	
 }

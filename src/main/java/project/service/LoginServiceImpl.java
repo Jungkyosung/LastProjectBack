@@ -55,6 +55,18 @@ public class LoginServiceImpl implements LoginService {
 	}
 	
 	@Override
+	public String idDuplicateCheck(String userId) throws Exception{
+		return loginMapper.idDuplicateCheck(userId);
+	}
+	
+	@Override
+	public String nicknameDuplicateCheck(String userNickname) throws Exception{
+		return loginMapper.nicknameDuplicateCheck(userNickname);
+	}
+	
+	
+	
+	@Override
 	public List<UserDto> googlelogin(GoogleDto googleDto) throws Exception{
 		String username = googleDto.getEmail();
 		return loginMapper.googlelogin(username);
