@@ -78,7 +78,7 @@
 	<insert id="insertTried" parameterType="project.dto.TriedDto">
 		insert into tried
 		(tried_title, tried_img, tried_content, tried_created_time, user_id, tried_category_idx)
-		values ( #{triedTitle}, #{triedImg}, #{triedContent}, now(), 'admin', #{triedCategoryIdx})
+		values ( #{triedTitle}, #{triedImg}, #{triedContent}, now(), #{userId}, #{triedCategoryIdx})
 	</insert>
 
 	<!-- 3. 어디까지 글쓰기 수정 -->
@@ -88,7 +88,7 @@
 		tried_img = #{triedImg},
 		tried_content = #{triedContent},
 		tried_created_time = now(),
-		user_id = 'admin'
+		user_id = #{userId}
 		where tried_idx = #{triedIdx}
 	</update>
 

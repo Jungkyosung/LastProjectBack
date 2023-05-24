@@ -50,6 +50,7 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public int registUser(UserDto userDto) throws Exception {
+		userDto.setUserImg("profile" + ((int)(Math.random()*8)+1) + ".png");
 		userDto.setUserPw(passwordEncoder.encode(userDto.getUserPw()));
 		return loginMapper.registUser(userDto);
 	}

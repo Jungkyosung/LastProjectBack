@@ -132,42 +132,42 @@ public class TriedController {
 		}
 	}
 
-	// 1-4. 어디까지 글쓰기에 사진 가져오기
-	@GetMapping("/api/getImage/{filename}")
-	public void getImage(@PathVariable("filename") String filename, HttpServletResponse response) throws Exception {
-		FileInputStream fis = null;
-		BufferedInputStream bis = null;
-		BufferedOutputStream bos = null;
-		try {
-			response.setHeader("Content-Disposition", "inline;"); // 4
-
-			byte[] buf = new byte[1024];
-			fis = new FileInputStream(UPLOAD_DIR + filename);
-			bis = new BufferedInputStream(fis);
-			bos = new BufferedOutputStream(response.getOutputStream());
-			int read;
-			while ((read = bis.read(buf, 0, 1024)) != -1) {
-				bos.write(buf, 0, read);
-			}
+//	// 1-4. 어디까지 글쓰기에 사진 가져오기
+//	@GetMapping("/api/getimage/{filename}")
+//	public void getImage(@PathVariable("filename") String filename, HttpServletResponse response) throws Exception {
+//		FileInputStream fis = null;
+//		BufferedInputStream bis = null;
+//		BufferedOutputStream bos = null;
+//		try {
+//			response.setHeader("Content-Disposition", "inline;"); // 4
+//
+//			byte[] buf = new byte[1024];
+//			fis = new FileInputStream(UPLOAD_DIR + filename);
+//			bis = new BufferedInputStream(fis);
+//			bos = new BufferedOutputStream(response.getOutputStream());
+//			int read;
+//			while ((read = bis.read(buf, 0, 1024)) != -1) {
+//				bos.write(buf, 0, read);
+//			}
 //			} finally {
 //				bos.close();
 //				bis.close();
 //				fis.close();
 //			}
-		} finally {
-			if (bos != null) {
-				bos.close();
-			}
-			if (bis != null) {
-				bis.close();
-			}
-			if (fis != null) {
-				fis.close();
-			}
-		}
-	}
+//		} finally {
+//			if (bos != null) {
+//				bos.close();
+//			}
+//			if (bis != null) {
+//				bis.close();
+//			}
+//			if (fis != null) {
+//				fis.close();
+//			}
+//		}
+//	}
 
-	//2. 어디까지 글쓰기 사진 저장
+	//2. 어디까지 글쓰기 저장
 	@PostMapping("/upload")
 	public ResponseEntity<String> uploadTried(
 			@RequestPart(value = "triedImg", required = false) MultipartFile[] triedImg,
@@ -235,34 +235,21 @@ public class TriedController {
 
 	// 3. 어디까지 글쓰기 사진 수정
 	@PutMapping("/reupload/{triedIdx}")
-//				public ResponseEntity<String> reuploadTried(
-//						@PathVariable("triedIdx") int triedIdx,
-//						@RequestBody TriedDto triedDto,
-//						@RequestPart(value = "triedImage", required = false) MultipartFile[] triedImg,
-//						@RequestPart(value = "data", required = false) TriedDto data) throws Exception {
-
 	public ResponseEntity<String> reuploadTried(@PathVariable("triedIdx") int triedIdx,
-			@ModelAttribute TriedDto triedDto,
-			@RequestParam(value = "triedImage", required = false) MultipartFile[] triedImg,
-			@ModelAttribute(value = "data") TriedDto data) throws Exception {
+			@RequestPart(value = "updateImg", required = false) MultipartFile[] updateImg,
+			@RequestPart(value = "data") TriedDto data) throws Exception {
+		
+		data.setTriedIdx(triedIdx);
 
-//				public ResponseEntity<String> reuploadTried(
-//						@PathVariable("triedIdx") int triedIdx,
-//						@ModelAttribute TriedDto triedDto,
-//						@RequestParam(value = "triedImage", required = false) MultipartFile[] triedImg,
-//						@RequestParam(value = "data", required = false) TriedDto data) throws Exception {
-
-		triedDto.setTriedIdx(triedIdx);
-
-		List<Map<String, String>> resultList = resaveFiles(triedImg);
+		List<Map<String, String>> resultList = resaveFiles(updateImg);
 		for (Map<String, String> result : resultList) {
 			String triedImage = result.get("savedFileName");
 			data.setTriedImg(triedImage);
 		}
 
-		service.updateTried(triedDto);
+		int resultCnt = service.updateTried(data);
 
-		if (triedDto != null) {
+		if (resultCnt != 0) {
 			return ResponseEntity.status(HttpStatus.OK).body("정상 처리");
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류 발생");

@@ -15,8 +15,8 @@
 	</select>
 	
 	<insert id="registUser" parameterType="project.dto.UserDto">
-		insert into user (user_id, user_pw, user_name, user_nickname, country_idx)
-		values (#{userId}, #{userPw}, #{userName}, #{userNickname}, #{countryIdx})
+		insert into user (user_id, user_pw, user_name, user_nickname, country_idx, user_img)
+		values (#{userId}, #{userPw}, #{userName}, #{userNickname}, #{countryIdx}, #{userImg})
 	</insert>
 	
 	<select id="idDuplicateCheck" parameterType="String" resultType="String">
