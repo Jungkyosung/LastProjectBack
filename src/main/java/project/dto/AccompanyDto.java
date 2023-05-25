@@ -13,6 +13,8 @@ public class AccompanyDto {
 	String accompanyStartTime;		//시작일
 	String accompanyEndTime;		//종료일
 	int accompanyCnt;				//조회수
-	String createdTime;				//작성시간
+	String accompanyCreatedTime;				//작성시간
 	String userId;					//유저아이디(외래키)
+	String accompanyRegion;			//지역
+	String accompanyDeleted;		//삭제여부
 }
