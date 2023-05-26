@@ -7,7 +7,9 @@
 	<!-- 1-1,2. 어디까지 '최신순' 리스트 조회 -->
 	<select id="selectTriedRecent" parameterType="project.dto.TriedDto" resultType="project.dto.TriedDto">
 		<![CDATA[
-		select * from tried 
+		select * from tried t
+		inner join user u
+		on t.user_id = u.user_id
 		where tried_category_idx=#{triedCategoryIdx}
 		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
 		and tried_deleted='N'
@@ -28,7 +30,9 @@
 	<!-- 1-1,2. 어디까지 '조회순' 리스트 조회 -->
 	<select id="selectTriedCount" parameterType="project.dto.TriedDto" resultType="project.dto.TriedDto">
 		<![CDATA[
-		select * from tried 
+		select * from tried t
+		inner join user u
+		on t.user_id = u.user_id
 		where tried_category_idx=#{triedCategoryIdx}
 		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
 		and tried_deleted='N'
@@ -49,7 +53,9 @@
 	<!-- 1-1,2. 어디까지 '추천순' 리스트 조회 -->
 	<select id="selectTriedRecommend" parameterType="project.dto.TriedDto" resultType="project.dto.TriedDto">
 		<![CDATA[
-		select * from tried 
+		select * from tried t
+		inner join user u
+		on t.user_id = u.user_id
 		where tried_category_idx=#{triedCategoryIdx}
 		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
 		and tried_deleted='N'

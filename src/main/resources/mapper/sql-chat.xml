@@ -96,8 +96,10 @@
 	<select id="selectMessage" parameterType="int"
 		resultType="project.dto.ChatDto">
 		select * from ( select * from chat where chatroom_id is
-		null order by created_dt desc limit ${num})
-		a order by a.created_dt
+		null order by created_dt desc limit ${num})a
+		inner join user u
+		on a.user_id = u.user_id
+		order by a.created_dt
 	</select>
 
 	<!-- 글로벌 채팅 내용 입력 -->
@@ -114,8 +116,10 @@
 	<select id="selectMessageChatroom" parameterType="String"
 		resultType="project.dto.ChatDto">
 		select * from ( select * from chat order by created_dt desc
-		)
-		a where chatroom_id = #{ chatroomId } order by a.created_dt
+		)a 
+		inner join user u
+		on a.user_id = u.user_id
+		where chatroom_id = #{ chatroomId } order by a.created_dt
 	</select>
 
 	<!-- 동행 채팅 내용 입력 -->

@@ -16,6 +16,7 @@ public class TriedDto {
 		int triedCnt;			// 조회수                    기본값 : 0
 		int triedRcmd;			// 추천수                    기본값 : 0
 		String userId;			// 유저 아이디(외래키)
+		String userNickname;	// 유저닉네임
 		int triedCategoryIdx;	// 어디까지 카테고리 인덱스(외래키)
 		Date syear;				// 어디까지 조회순 시작 날짜
 		Date lyear;				// 어디까지 조회순 끝 날짜

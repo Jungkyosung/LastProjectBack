@@ -35,14 +35,17 @@ public class WebChatEventListener {
 		StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
 		String username = (String) headerAccessor.getSessionAttributes().get("username");
+		String userNickname = (String) headerAccessor.getSessionAttributes().get("userNickname");
 		String chatroomId = (String) headerAccessor.getSessionAttributes().get("chatroomId");
+		String userImg = (String) headerAccessor.getSessionAttributes().get("userImg");
 		log.info("채팅룸 ID" + chatroomId);		
 		
 		ChatDto chatMessage = new ChatDto();
 		chatMessage.setType(ChatDto.MessageType.LEAVE);
 		chatMessage.setUserId(username);
 		chatMessage.setChatroomId(chatroomId);
-		chatMessage.setMessage(username + "님이 퇴장하셨습니다.");
+		chatMessage.setUserImg(userImg);
+		chatMessage.setMessage(userNickname + "님이 퇴장하셨습니다.");
 		
 		// 유저 아이디랑 채팅방ID가 다 있다면 = 동행채팅방
 		if (username != null && chatroomId != null) {

@@ -31,8 +31,10 @@ public class ChatController {
 		
 		//(헤더)세션에 사용자 이름 저장, WebSocketEventListener에서 연결 끊길 시 사용자 식별위해 사용
 		headerAccessor.getSessionAttributes().put("username", chatDto.getUserId());
+		headerAccessor.getSessionAttributes().put("userNickname", chatDto.getUserNickname());
+		headerAccessor.getSessionAttributes().put("userImg", chatDto.getUserImg());
 		
-		chatDto.setMessage(chatDto.getUserId() + "님이 입장하셨습니다.");
+		chatDto.setMessage(chatDto.getUserNickname() + "님이 입장하셨습니다.");
 		service.insertMessage(chatDto);
 		List<ChatDto> list = service.selectMessage();
 		chatDto.setHistory(list);
@@ -49,6 +51,8 @@ public class ChatController {
 		//DB에 입력
 		service.insertMessage(chatDto);
 		
+		System.out.println(">>>>>>>>채팅입력내역"+chatDto);
+		
 		return chatDto;
 	}
 	
@@ -61,7 +65,10 @@ public class ChatController {
 			
 			//(헤더)세션에 사용자 이름, 채팅방ID 저장, WebSocketEventListener에서 연결 끊길 시 사용자 식별위해 사용
 			headerAccessor.getSessionAttributes().put("username", chatDto.getUserId());
+			headerAccessor.getSessionAttributes().put("userNickname", chatDto.getUserNickname());
+			headerAccessor.getSessionAttributes().put("userImg", chatDto.getUserImg());
 			headerAccessor.getSessionAttributes().put("chatroomId", chatDto.getChatroomId());
+			
 			
 			//chatroom_user테이블에 chatroomId로 조회해서 userId가 없다면 insert입력
 			ChatroomUserDto chtroomUserDto = new ChatroomUserDto();
@@ -76,7 +83,7 @@ public class ChatController {
 				service.insertUserIdToChatroomUser(chtroomUserDto);
 			}
 			
-			chatDto.setMessage(chatDto.getUserId() + "님이 입장하셨습니다.");
+			chatDto.setMessage(chatDto.getUserNickname() + "님이 입장하셨습니다.");
 			service.insertMessageChatroom(chatDto);
 			List<ChatDto> list = service.selectMessageChatroom(chatDto.getChatroomId());
 			chatDto.setHistory(list);
@@ -92,6 +99,8 @@ public class ChatController {
 					
 			//DB에 입력
 			service.insertMessageChatroom(chatDto);
+			
+			System.out.println(">>>>>>>>채팅입력내역"+chatDto);
 			
 			return chatDto;
 		}

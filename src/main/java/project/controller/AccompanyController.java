@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,7 +27,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import project.dto.AccompanyDto;
+import project.dto.ChatroomDto;
+import project.dto.ChatroomUserDto;
 import project.service.AccompanyService;
+import project.service.ChatService;
 
 @Controller
 public class AccompanyController {
@@ -36,6 +40,10 @@ public class AccompanyController {
 	@Autowired
 	private AccompanyService service;
 	
+	@Autowired
+	private ChatService chatService;
+
+
 	// Accompany 페이징 및 검색
 	@GetMapping("/api/accompanylistbypage")
 	public ResponseEntity<List<AccompanyDto>> listAccompanyDtoByPages(@RequestParam("pages") int pages,
@@ -113,6 +121,30 @@ public class AccompanyController {
 		}
 	}
 
+	// Accompany 동행채팅 연결
+	@GetMapping("/api/addchatuser")
+	public ResponseEntity<String> addUserChatroom(@RequestParam("chatroomId") String chatroomId,@RequestParam("userId") String userId) throws Exception{
+		
+		//chatroom_user테이블에 chatroomId로 조회해서 userId가 없다면 insert입력
+		ChatroomUserDto chtroomUserDto = new ChatroomUserDto();
+		chtroomUserDto.setChatroomId(chatroomId);
+		chtroomUserDto.setUserId(userId);
+		List<ChatroomUserDto> chatroomUserDtoList = chatService.selectListByChatroomIdAndUserId(chtroomUserDto);
+		
+		//조회된 리스트의 개수가 0이면, 현재 접속하려는 chatroomId에 userId가 없다는 뜻,
+		//chatroom_user 테이블에 데이터를 추가입력 해줘야 함.
+		if ( chatroomUserDtoList.size() == 0) {
+
+			chatService.insertUserIdToChatroomUser(chtroomUserDto);
+			return ResponseEntity.status(HttpStatus.OK).body("새로운채팅연결");
+			
+		} else {
+		
+			return ResponseEntity.status(HttpStatus.OK).body("기존채팅연결");
+		}
+	}
+	
+	
 	// Accompany 작성
 	@PostMapping("/api/accompany/write")
 	public ResponseEntity<String> insertAccompany(
@@ -125,9 +157,42 @@ public class AccompanyController {
 			data.setAccompanyImage(accImg);
 		}
 
+		//작성 후 인덱스 받아옴.
 		service.insertAccompany(data);
+		int accompanyIdx = data.getAccompanyIdx();
+		//해당 인덱스로 채팅방 생성
+		String 채팅UUID = chatService.selectChatroomByAccompanyId(accompanyIdx);
 
-		if (data != null) {
+		if (채팅UUID == null) {
+
+			// 방하나 만들어 줌.
+			ChatroomDto chatroom = new ChatroomDto();
+			String chatroomId = UUID.randomUUID().toString();
+
+			chatroom.setChatroomId(chatroomId);
+			chatroom.setAccompanyIdx(accompanyIdx);
+
+			// 만들고
+			chatService.insertChatroom(chatroom);
+
+			// 다시 조회
+			채팅UUID = chatService.selectChatroomByAccompanyId(accompanyIdx);
+
+		} else {
+			// 있으면 조회됐겠지?
+		}
+		
+		
+		System.out.println(">>>>>>>>" + data.getUserId() + 채팅UUID);
+		//해당 채팅방 UUID로 유저ID 등록
+		ChatroomUserDto chtroomUserDto = new ChatroomUserDto();
+		chtroomUserDto.setChatroomId(채팅UUID);
+		chtroomUserDto.setUserId(data.getUserId());
+		
+		chatService.insertUserIdToChatroomUser(chtroomUserDto);
+		
+
+		if (accompanyIdx != 0) {
 			return ResponseEntity.status(HttpStatus.OK).body("정상 처리");
 		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("오류 발생");
