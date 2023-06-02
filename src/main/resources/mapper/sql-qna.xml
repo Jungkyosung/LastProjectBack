@@ -8,7 +8,7 @@
 		insert into
 			qna(qna_title,qna_content,qna_img,qna_created_time, user_id)
 		values
-			(#{qnaTitle}, #{qnaContent}, #{qnaImg}, now(), 'admin')
+			(#{qnaTitle}, #{qnaContent}, #{qnaImg}, now(), #{userId})
 	</insert>
 
 	<!-- QNA 삭제 -->
@@ -40,7 +40,7 @@
 
 	<!-- QNA 상세페이지 조회 -->
 	<select id="selectQnaInfo" parameterType="int" resultType="project.dto.QnaDto">
-		select qna_idx, qna_title, qna_content,
+		select qna_idx, qna_title, qna_content, user_id,
 		       date_format(qna_created_time, '%Y.%m.%d' ) as qna_created_time
 		  from qna
 		 where qna_deleted = 'N' and qna_idx=#{qnaIdx}
