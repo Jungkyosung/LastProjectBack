@@ -1,16 +1,11 @@
 package project.controller;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
+import project.dto.TriedCommentDto;
 import project.dto.TriedDto;
 import project.service.TriedService;
 
@@ -132,43 +127,9 @@ public class TriedController {
 		}
 	}
 
-//	// 1-4. 어디까지 글쓰기에 사진 가져오기
-//	@GetMapping("/api/getimage/{filename}")
-//	public void getImage(@PathVariable("filename") String filename, HttpServletResponse response) throws Exception {
-//		FileInputStream fis = null;
-//		BufferedInputStream bis = null;
-//		BufferedOutputStream bos = null;
-//		try {
-//			response.setHeader("Content-Disposition", "inline;"); // 4
-//
-//			byte[] buf = new byte[1024];
-//			fis = new FileInputStream(UPLOAD_DIR + filename);
-//			bis = new BufferedInputStream(fis);
-//			bos = new BufferedOutputStream(response.getOutputStream());
-//			int read;
-//			while ((read = bis.read(buf, 0, 1024)) != -1) {
-//				bos.write(buf, 0, read);
-//			}
-//			} finally {
-//				bos.close();
-//				bis.close();
-//				fis.close();
-//			}
-//		} finally {
-//			if (bos != null) {
-//				bos.close();
-//			}
-//			if (bis != null) {
-//				bis.close();
-//			}
-//			if (fis != null) {
-//				fis.close();
-//			}
-//		}
-//	}
 
-	//2. 어디까지 글쓰기 저장
-	@PostMapping("/upload")
+	//2. 어디까지 글쓰기 저장(upload에서 바꿈)
+	@PostMapping("/api/tried")
 	public ResponseEntity<String> uploadTried(
 			@RequestPart(value = "triedImg", required = false) MultipartFile[] triedImg,
 			@RequestPart(value = "data", required = false) TriedDto data) throws Exception {
@@ -233,8 +194,8 @@ public class TriedController {
 		return null;
 	}
 
-	// 3. 어디까지 글쓰기 사진 수정
-	@PutMapping("/reupload/{triedIdx}")
+	// 3. 어디까지 글쓰기 사진 수정(reupload에서 바꿈)
+	@PutMapping("/api/tried/{triedIdx}")
 	public ResponseEntity<String> reuploadTried(@PathVariable("triedIdx") int triedIdx,
 			@RequestPart(value = "updateImg", required = false) MultipartFile[] updateImg,
 			@RequestPart(value = "data") TriedDto data) throws Exception {
@@ -302,58 +263,105 @@ public class TriedController {
 	}
 	
 	
+	// 5-1. 어디까지 댓글 조회
+	@GetMapping("/api/tried/comment/{triedIdx}")
+	public ResponseEntity<List<TriedCommentDto>> selectTriedComment(@PathVariable("triedIdx") int triedIdx) throws Exception{
+		
+		
+		List<TriedCommentDto> selectCommentList = service.selectTriedComment(triedIdx);
+		if (selectCommentList == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(selectCommentList);
+		}
+	}
 	
-
-	// 어디까지 리스트 조회(삭제예정)
-//	@GetMapping("/api/tried")
-//	public ResponseEntity<List<TriedDto>> openTriedList() throws Exception {
-//		List<TriedDto> list = service.selectTriedList();
-//		if (list != null && list.size() > 0) {
-//			return ResponseEntity.status(HttpStatus.OK).body(list);
-//		} else {
-//			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//		}
-//	}
-
-	// 어디까지 글쓰기(삭제예정)
-//	@PostMapping("/api/tried/write")
-//	public ResponseEntity<Map<String, Object>> insertTried(@RequestBody TriedDto triedDto) throws Exception {
-//		int insertedCount = 0;
-//		try {
-//			insertedCount = service.insertTried(triedDto);
-//			if (insertedCount > 0) {
-//				Map<String, Object> result = new HashMap<>();
-//
-//				File mf = null;
-//				result.put("message", "정상적으로 등록되었습니다."); // String -> Object
-//				result.put("count", insertedCount); // Integer-> Object
-//				result.put("triedIdx", triedDto.getTriedIdx());
-//				return ResponseEntity.status(HttpStatus.OK).body(result);
-//			} else {
-//				Map<String, Object> result = new HashMap<>();
-//				result.put("message", "등록된 내용이 없습니다.");
-//				result.put("count", insertedCount);
-//				return ResponseEntity.status(HttpStatus.OK).body(result);
-//			}
-//		} catch (Exception e) {
-//			Map<String, Object> result = new HashMap<>();
-//			result.put("message", "등록 중 오류가 발생했습니다.");
-//			result.put("count", insertedCount);
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
-//		}
-//	}
+	// 5-2. 어디까지 댓글 입력
+	@PostMapping("/api/tried/comment/{triedIdx}")
+	public ResponseEntity<Integer> insertTriedComment(@RequestBody TriedCommentDto triedComment) throws Exception{
+		
+		int insertedCnt = service.insertTriedComment(triedComment);
+		if (insertedCnt == 0) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(insertedCnt);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(insertedCnt);
+		}
+	}
 	
-	// 어디까지 수정(삭제예정)
-//	@PutMapping("/api/tried/{triedIdx}")
-//	public ResponseEntity<Integer> updateTried(@PathVariable("triedIdx") int triedIdx, @RequestBody TriedDto triedDto)
-//			throws Exception {
-//		triedDto.setTriedIdx(triedIdx);
-//		int updatedCount = service.updateTried(triedDto);
-//		if (updatedCount != 1) {
-//			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updatedCount);
-//		} else {
-//			return ResponseEntity.status(HttpStatus.OK).body(updatedCount);
-//		}
-//	}
+	// 5-3. 어디까지 댓글 수정
+	@PutMapping("/api/tried/comment/{triedCommentIdx}")
+	public ResponseEntity<Integer> updateTriedComment(@RequestBody TriedCommentDto triedComment) throws Exception {
+		int updatedCount = service.updateTriedComment(triedComment);
+		if (updatedCount != 1) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updatedCount);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(updatedCount);
+		}
+	}
+	
+	// 5-4. 어디까지 댓글 삭제
+	@DeleteMapping("/api/tried/comment/{triedCommentIdx}")
+	public ResponseEntity<Integer> deleteTriedComment(@PathVariable("triedCommentIdx") int triedCommentIdx) throws Exception{
+		
+		int deletedCnt = service.deleteTriedComment(triedCommentIdx);
+		if (deletedCnt == 0) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(deletedCnt);
+		}
+	}
+	
+	// 6-1. 어디까지 게시글 유저 추천 확인
+	@GetMapping("/api/tried/rcmd/user")
+	public ResponseEntity<Integer> selectTriedRcmdByUserId(@RequestParam("triedIdx") int triedIdx, @RequestParam("userId") String userId) throws Exception{
+	
+		int checkRcmdCnt = service.selectTriedRcmdByUserId(triedIdx, userId);
+		
+		if (checkRcmdCnt == 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(checkRcmdCnt);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(checkRcmdCnt);
+		}
+	}
+	
+	// 6-2. 어디까지 게시글 추천 추가
+	@PostMapping("/api/tried/rcmd/user")
+	public ResponseEntity<Integer> insertTriedRcmd(@RequestParam("triedIdx") int triedIdx, @RequestParam("userId") String userId) throws Exception{
+	
+		int insertedRcmdCnt = service.insertTriedRcmd(triedIdx, userId);
+		
+		if (insertedRcmdCnt == 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(insertedRcmdCnt);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(insertedRcmdCnt);
+		}
+	}
+	
+	// 6-3. 어디까지 게시글 추천 삭제
+	@DeleteMapping("/api/tried/rcmd/user")
+	public ResponseEntity<Integer> deleteTriedRcmd(@RequestParam("triedIdx") int triedIdx, @RequestParam("userId") String userId) throws Exception{
+	
+		int deletedRcmdCnt = service.deleteTriedRcmd(triedIdx, userId);
+		
+		if (deletedRcmdCnt == 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(deletedRcmdCnt);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(deletedRcmdCnt);
+		}
+	}
+	
+	// 6-4. 어디까지 게시글 추천수 조회
+	@GetMapping("/api/tried/rcmd/{triedIdx}")
+	public ResponseEntity<Integer> selectTriedRcmdCount(@RequestParam("triedIdx") int triedIdx) throws Exception{
+	
+		int rcmdCnt = service.selectTriedRcmdCount(triedIdx);
+		
+		if (rcmdCnt == 0) {
+			return ResponseEntity.status(HttpStatus.OK).body(rcmdCnt);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body(rcmdCnt);
+		}
+	}
+
 
 }

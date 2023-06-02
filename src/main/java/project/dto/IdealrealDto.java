@@ -15,4 +15,7 @@ public class IdealrealDto {
 	String idealrealIdealImg;		//이상사진
 	String idealrealRealImg;		//현실사진
 	String userId;					//유저아이디(외래키)
+	String userNickname;
+	String update;
+	int likeCount;
 }

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.mapper.IdealrealMapper">
+
+	<!-- 1. 이상과현실 리스트 조회 -->
+	<select id="selectIdealRealList"
+		resultType="project.dto.IdealrealDto">
+		select * from idealreal ir
+		left outer join
+		(select
+		idealreal_idx as
+		rcmd_idealreal_idx, count(*) as like_count from rcmd
+		group by
+		idealreal_idx) a
+		on ir.idealreal_idx = a.rcmd_idealreal_idx
+		where
+		ir.idealreal_deleted='N'
+		order by ir.idealreal_idx desc
+	</select>
+
+	<!-- 1-1. 이상과현실 리스트 조회(좋아요 순) -->
+	<select id="selectIdealRealListWithLike"
+		resultType="project.dto.IdealrealDto">
+		select * from idealreal ir
+		left outer join
+		(select
+		idealreal_idx as rcmd_idealreal_idx, count(*) as like_count from rcmd
+		group by idealreal_idx) a
+		on ir.idealreal_idx = a.rcmd_idealreal_idx
+		where ir.idealreal_deleted='N'
+		order by like_count desc,
+		ir.idealreal_idx desc
+	</select>
+
+	<!-- 1-2. 이상과현실 리스트 최신순 조회(페이징) -->
+	<select id="selectIdealRealListPage" parameterType="int"
+		resultType="project.dto.IdealrealDto">
+		select * from idealreal ir
+		left outer join
+		(select
+		idealreal_idx as
+		rcmd_idealreal_idx, count(*) as like_count from rcmd
+		group by
+		idealreal_idx) a
+		on ir.idealreal_idx = a.rcmd_idealreal_idx
+		where
+		ir.idealreal_deleted='N'
+		order by ir.idealreal_idx desc
+		limit
+		#{page}, 8
+	</select>
+	
+	<!-- 1-3. 이상과현실 리스트 추천순 조회(페이징) -->
+	<select id="selectIdealRealListWithLikePage" parameterType="int"
+		resultType="project.dto.IdealrealDto">
+		select * from idealreal ir
+		left outer join
+		(select
+		idealreal_idx as rcmd_idealreal_idx, count(*) as like_count from rcmd
+		group by idealreal_idx) a
+		on ir.idealreal_idx = a.rcmd_idealreal_idx
+		where ir.idealreal_deleted='N'
+		order by like_count desc,
+		ir.idealreal_idx desc
+		limit #{page}, 8
+	</select>
+
+	<!-- 1-4. 게시판 페이지 수 조회 -->
+	<select id="listidealrealpagecount" resultType="int">
+		select ceil(count(*)/8) from idealreal
+		where idealreal_deleted='N'
+	</select>
+
+	<!-- 2. 이상과현실 상세조회 -->
+	<select id="selectIdealrealDetail" parameterType="int"
+		resultType="project.dto.IdealrealDto">
+		select ir.idealreal_idx, ir.idealreal_title, ir.idealreal_content,
+		ir.idealreal_cnt, ir.idealreal_ideal_img, ir.idealreal_real_img,
+		date_format(ir.idealreal_created_time, '%Y-%m-%d %H:%i:%s') as
+		idealreal_created_time,
+		ir.user_id, u.user_nickname
+		from idealreal ir
+		inner join user u
+		on ir.user_id = u.user_id
+		where ir.idealreal_deleted =
+		'N' and ir.idealreal_idx = #{idealrealIdx}
+	</select>
+
+	<!-- 2-1. 이상과현실 상세조회시 조회수 증가 -->
+	<update id="updatecnt" parameterType="int">
+		update idealreal
+		set
+		idealreal_cnt = idealreal_cnt + 1
+		where idealreal_idx = #{idealrealIdx}
+	</update>
+
+	<!-- 3. 이상과현실 입력 -->
+	<insert id="insertIdealreal"
+		parameterType="project.dto.IdealrealDto">
+		insert into idealreal (idealreal_title,
+		idealreal_content, idealreal_created_time, user_id,
+		idealreal_ideal_img,
+		idealreal_real_img)
+		values (
+		#{idealrealTitle},
+		#{idealrealContent}, now(), #{userId}, #{idealrealRealImg},
+		#{idealrealIdealImg} )
+	</insert>
+
+	<!-- 4. 이상과현실 수정 -->
+	<update id="updateIdealreal"
+		parameterType="project.dto.IdealrealDto">
+		update idealreal
+		set idealreal_title = #{idealrealTitle},
+		idealreal_content = #{idealrealContent},
+		idealreal_ideal_img = #{idealrealIdealImg},
+		idealreal_real_img = #{idealrealRealImg},
+		idealreal_created_time = now(),
+		user_id = #{userId}
+		where idealreal_idx = #{idealrealIdx}
+	</update>
+	
+	
+
+	<!-- 5. 이상과현실 삭제 -->
+	<delete id="deleteIdealreal" parameterType="int">
+		update idealreal
+		set
+		idealreal_deleted = 'Y',
+		idealreal_created_time = now()
+		where idealreal_idx = #{idealrealIdx}
+	</delete>
+
+	<!-- 6. 좋아요 수 조회 -->
+	<select id="selectLikesCount" parameterType="int"
+		resultType="int">
+		SELECT IFNULL(t.count, 0) as count
+		FROM (SELECT COUNT(*) as count
+      	FROM rcmd
+      	WHERE idealreal_idx = #{idealrealIdx}) t;
+	</select>
+
+	<!-- 6-1. 좋아요 추가 -->
+	<insert id="updateLikesCount" parameterType="project.dto.RcmdDto">
+		insert into rcmd (user_id, idealreal_idx )
+		values ( #{userId}, #{idealrealIdx} )
+	</insert>
+
+	<!-- 6-2. 좋아요 취소 -->
+	<delete id="deleteLikesCount" parameterType="project.dto.RcmdDto">
+		delete from rcmd
+        where idealreal_idx = #{idealrealIdx}
+        and user_id = #{userId}
+	</delete>
+	
+	<!-- 6-3. 좋아요 누른 유저인지 확인 -->
+	<select id="selectLikesCountByUser" resultType="int">
+		select count(*) from rcmd
+		where user_id = #{userId}
+        and idealreal_idx = #{idealrealIdx};
+	</select>
+	
+	<!-- 7. 게시글 수정 사진 저장 -->
+	<update id="reuploadIdealreal">
+		insert into
+		idealreal(idealreal_ideal_img,
+		idealreal_real_img)
+		values
+		(#{idealrealRealImg},#{idealrealIdealImg})
+	</update>
+	
+	<!-- (삭제예정)게시판 글 사진 저장 -->
+	<insert id="uploadIdealreal">
+		insert into
+		idealreal(idealreal_ideal_img,
+		idealreal_real_img)
+		values
+		(#{idealrealRealImg},#{idealrealIdealImg})
+	</insert>
+
+</mapper>

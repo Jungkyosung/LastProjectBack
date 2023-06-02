@@ -13,8 +13,11 @@ public class TravelcourseDto {
 	private int travelcourseRcmd;				//여행코스추천수
 	private String travelcourseDeleted;			//삭제여부
 	private String userId;						//유저아이디(외래키)
+	private String userNickname;				//유저닉네임
+	private String userImg;						//유저이미지
 	private String travelcourseTitle; 			//여행코스제목
 	private String travelcourseStartDate;		//여행 시작일
 	private String travelcourseEndDate;         //여행 끝일
-	private List<TravelcourseDetailListDto> travelcourseDetailListDto; //여행코스 일정 세부내역
+	private List<TravelcourseDetailListDto> travelcourseDetailList; //여행코스 일정 세부내역
+	private String travelcourseImg;				//여행코스 썸넬 이미지 하나
 }

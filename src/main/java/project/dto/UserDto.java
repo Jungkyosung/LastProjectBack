@@ -11,5 +11,6 @@ public class UserDto {
 	private int countryIdx;			//국가번호(외래키)	
 	private String userName;		//유저네임
 	private String userImg;			//유저프사
+	private String userSuspension;	//정지기한
 	
 }

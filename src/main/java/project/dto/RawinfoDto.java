@@ -10,4 +10,5 @@ public class RawinfoDto {
 	String rawinfoImg;			//사진
 	String rawinfoDescription;	//설명
 	int triedCategoryIdx;		//어디까지게시판카테고리인덱스(외래키)
+	int idealworldcupWincnt;	//이상형월드컵우승횟수
 }

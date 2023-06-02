@@ -73,5 +73,10 @@ public class LoginServiceImpl implements LoginService {
 		return loginMapper.googlelogin(username);
 		
 	}
+	
+	@Override
+	public int selectSuspensionByUser(String userId) throws Exception{
+		return loginMapper.selectSuspensionByUser(userId);
+	}
 
 }

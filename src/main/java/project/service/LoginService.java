@@ -15,5 +15,5 @@ public interface LoginService extends UserDetailsService {
 	public String idDuplicateCheck(String userId) throws Exception;
 	public String nicknameDuplicateCheck(String userNickname) throws Exception;
 	public List<UserDto> googlelogin(GoogleDto googleDto) throws Exception;
-	
+	public int selectSuspensionByUser(String userId) throws Exception;
 }

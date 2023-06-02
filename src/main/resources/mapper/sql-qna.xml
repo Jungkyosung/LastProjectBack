@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="project.mapper.QnaMapper">
+
+	<!-- QNA 작성 -->
+	<insert id="insertQna" parameterType="project.dto.QnaDto">
+		insert into
+			qna(qna_title,qna_content,qna_img,qna_created_time, user_id)
+		values
+			(#{qnaTitle}, #{qnaContent}, #{qnaImg}, now(), 'admin')
+	</insert>
+
+	<!-- QNA 삭제 -->
+	<delete id="deleteQna" parameterType="int">
+		update qna
+		   set qna_deleted = 'Y',
+		       user_id = 'Admin'
+		 where qna_idx = #{qnaIdx}
+	</delete>
+
+	<!-- QNA 수정 -->
+	<update id="updateQna" parameterType="project.dto.QnaDto">
+		update qna
+		   set qna_title = #{qnaTitle},
+		       qna_content = #{qnaContent},
+		       qna_created_time = now(),
+		       user_id = 'Admin'
+		 where qna_idx = #{qnaIdx}
+	</update>
+
+	<!-- QNA 상세페이지 COMMENT 리스트 -->
+	<select id="selectCommentList" resultType="project.dto.QnaCommentDto" parameterType="int">
+		select qna_comment_idx, user_id, qna_comment_content, qna_idx,
+		       date_format(qna_comment_time, '%Y.%m.%d %H:%i:%s' )
+		    as qna_comment_time
+		  from qna_comment
+		 where qna_idx=#{qnaIdx}
+	</select>
+
+	<!-- QNA 상세페이지 조회 -->
+	<select id="selectQnaInfo" parameterType="int" resultType="project.dto.QnaDto">
+		select qna_idx, qna_title, qna_content,
+		       date_format(qna_created_time, '%Y.%m.%d' ) as qna_created_time
+		  from qna
+		 where qna_deleted = 'N' and qna_idx=#{qnaIdx}
+	</select>
+
+	<!-- QNA 상세페이지 COMMENT 등록 -->
+	<insert id="insertComment" parameterType="project.dto.QnaCommentDto">
+		insert into 
+			qna_comment (qna_comment_content, qna_comment_time, qna_idx, user_id)
+		values
+			(#{qnaCommentContent}, now(), #{qnaIdx}, 'lsy00812@gmail.com')
+
+	</insert>
+
+
+	<!-- QNA 검색 -->
+	<select id="listQnaDtoByPages" resultType="project.dto.QnaDto">
+		select * 
+		  from ( select qna_idx, qna_title, user_id, qna_content,
+		                date_format(qna_created_time, '%Y.%m.%d' ) as qna_created_time
+		           from qna
+		          where qna_title like concat('%',#{search},'%' )
+		             or qna_content like concat('%',#{search},'%' )
+		       order by qna_idx desc )
+		    as qna_page
+		limit 10
+		offset #{pages}
+	</select>
+
+	<!-- QNA 검색 페이지 수 조회 -->
+	<select id="listQnaDtoSearchPageCount" resultType="int">
+		select ceil( count(*)/ 10 ) 
+		  from ( select qna_idx, qna_title, user_id, qna_content,
+		                date_format(qna_created_time, '%Y.%m.%d' ) as qna_created_time
+		           from qna
+		          where qna_title like concat('%',#{search},'%' )
+		             or qna_content like concat('%',#{search},'%' )
+		       order by qna_idx desc)
+		    as qna_search_count
+	</select>
+	
+	<!-- QNA 페이지 수 조회 -->
+	<select id="listQnaDtoPageCount" resultType="int">
+		select ceil( count(*) / 10 )
+		  from qna
+	</select>
+
+</mapper>

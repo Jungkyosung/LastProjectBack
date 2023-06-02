@@ -75,6 +75,17 @@ public class RestLoginApiController {
 	}
 	
 
+	//로그인시 정지기한 비교 남은 정지 일수 반환
+	@GetMapping("/api/user/suspension")
+	public ResponseEntity<Object> selectSuspensionByUser(@RequestParam("userId") String userId) throws Exception{
+		
+		int restSuspensionDay = loginService.selectSuspensionByUser(userId);
+		if ( restSuspensionDay > 0 ) {
+			return ResponseEntity.status(HttpStatus.OK).body(restSuspensionDay);
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body("이상없음");
+		}
+	}
 	
 	
 }

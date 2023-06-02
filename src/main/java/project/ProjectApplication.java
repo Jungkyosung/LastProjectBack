@@ -22,3 +22,4 @@ public class ProjectApplication {
 		return new BCryptPasswordEncoder();
 	}
 }
+	

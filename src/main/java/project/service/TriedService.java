@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import project.dto.TriedCommentDto;
 import project.dto.TriedDto;
 import project.mapper.TriedMapper;
 
@@ -67,9 +68,25 @@ public class TriedService {
 		return mapper.deleteTried(triedIdx);
 	}
 
+	// 5-1. 어디까지 댓글 조회
+	public List<TriedCommentDto> selectTriedComment(int triedIdx) throws Exception{
+		return mapper.selectTriedComment(triedIdx);
+	}
 	
+	// 5-2. 어디까지 댓글 입력
+	public int insertTriedComment(TriedCommentDto triedComment) throws Exception{
+		return mapper.insertTriedComment(triedComment);
+	}
 	
+	// 5-3. 어디까지 댓글 수정
+	public int updateTriedComment(TriedCommentDto triedComment) throws Exception{
+		return mapper.updateTriedComment(triedComment);
+	}
 	
+	// 5-4. 어디까지 댓글 삭제
+	public int deleteTriedComment(int triedCommentIdx) throws Exception{
+		return mapper.deleteTriedComment(triedCommentIdx);
+	}
 	
 	//업로드(삭제예정)
 	public int uploadTried(TriedDto triedDto, MultipartFile[] files) throws Exception {
@@ -85,6 +102,27 @@ public class TriedService {
 	public List<TriedDto> selectTriedList() throws Exception {
 		return mapper.selectTriedList();
 	}
+	
+	// 6-1. 어디까지 게시글 유저 추천 확인
+	public int selectTriedRcmdByUserId(int triedIdx, String userId) throws Exception{
+		return mapper.selectTriedRcmdByUserId(triedIdx, userId);
+	}
+	// 6-2. 어디까지 게시글 추천 추가
+	public int insertTriedRcmd(int triedIdx, String userId) throws Exception{
+		return mapper.insertTriedRcmd(triedIdx, userId);
+	}
+	
+	// 6-3. 어디까지 게시글 추천 삭제
+	public int deleteTriedRcmd(int triedIdx, String userId) throws Exception{
+		return mapper.deleteTriedRcmd(triedIdx, userId);
+	}
+	
+	// 6-4. 어디까지 게시글 추천수 조회
+	public int selectTriedRcmdCount(int triedIdx) throws Exception{
+		return mapper.selectTriedRcmdCount(triedIdx);
+	}
+	
+	
 
 
 }

@@ -13,4 +13,6 @@ public class ReportDto {
 	String reportContent;		//신고내용
 	int reportReasonIdx;		//신고사유인덱스(외래키)
 	int boardIdx;				//게시판종류인덱스(외래키)
+	String reportTime;			//신고시간
+	String reportReasonName;	//신고사유(조인)
 }

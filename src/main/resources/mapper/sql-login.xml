@@ -36,6 +36,11 @@
 			from user
 		where user_id = #{userId}
 	</select>
-	 
+	
+	<select id="selectSuspensionByUser" parameterType="String" resultType="int">
+	 	select ifnull(datediff(user_suspension, now()),0) 
+	 	from user 
+	 	where user_id=#{userId}
+	 </select>
 	 
 </mapper>

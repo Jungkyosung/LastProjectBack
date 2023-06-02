@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="project.mapper.ReportMapper">
+	
+	<!-- 1. 신고 입력 -->
+	<insert id="insertReportUser" parameterType="project.dto.ReportDto">
+		insert into report
+		(report_reporter, report_reported_user, report_content, report_reason_idx, report_time)
+		values
+		(#{reportReporter}, #{reportReportedUser}, #{reportContent}, #{reportReasonIdx}, now())
+	</insert>
+	
+	<!-- 2.최근 신고 내역 페이지별(30개) 조회  -->
+	<select id="selectReportUserList" parameterType="int" resultType="project.dto.ReportDto">
+		select r.report_reporter, r.report_reported_user, r.report_content, r.report_reason_idx, r.report_time, rr.report_reason_name  from report r
+		inner join report_reason rr
+		on r.report_reason_idx = rr.report_reason_idx
+		order by report_time desc
+		limit #{page}, 30
+	</select>
+
+	<!-- 2-1. 신고 내역 페이지수 조회 -->
+	<select id="selectReportPageCount" resultType="int">
+		select ceil(count(*)/30)  from report r
+		inner join report_reason rr
+		on r.report_reason_idx = rr.report_reason_idx
+	</select>
+
+	<!-- 3-1. 사용자 신고당한 횟수 -->
+	<select id="selectReportedCount" resultType="int">
+		select count(*) from report
+		where report_reported_user = #{reportReportedUser}
+	</select>
+	
+	<!-- 3-2. 피신고자 여행코스 리스트 조회 -->
+	<select id="selectReportedTCList" resultType="project.dto.TravelcourseDto">
+		select tc.travelcourse_idx, tc.travelcourse_createdtime, tc.travelcourse_title  from report r
+		inner join travelcourse tc
+		on r.report_reported_user = tc.user_id
+		where r.report_reported_user = #{reportReportedUser}
+		and tc.travelcourse_deleted = 'N'
+		order by travelcourse_createdtime desc
+	</select>
+	
+	<!-- 3-3. 피신고자 여행코스 댓글 리스트 조회 -->
+	<select id="selectReportedTCCList" resultType="project.dto.TravelcourseCommentDto">
+		select tcc.travelcourse_comment_idx, tcc.travelcourse_comment, tcc.travelcourse_comment_time  from report r
+		inner join travelcourse_comment tcc
+		on r.report_reported_user = tcc.user_id
+		where r.report_reported_user = #{reportReportedUser}
+		order by travelcourse_comment_time desc
+	</select>
+	
+	<!-- 3-4. 피신고자 어디까지 리스트 조회 -->
+	<select id="selectReportedTrList" resultType="project.dto.TriedDto">
+		select tr.tried_idx, tr.tried_title, tr.tried_content, tr.tried_created_time from report r
+		inner join tried tr
+		on r.report_reported_user = tr.user_id
+		where r.report_reported_user = #{reportReportedUser}
+		and tr.tried_deleted='N'
+		order by tried_created_time desc
+	</select>
+	
+	<!-- 3-5. 피신고자 어디까지 댓글 리스트 조회 -->
+	<select id="selectTrCList" resultType="project.dto.TriedCommentDto">
+		select trc.tried_comment_idx, trc.tried_comment_content, trc.tried_comment_time from report r
+		inner join tried_comment trc
+		on r.report_reported_user = trc.user_id
+		where r.report_reported_user = #{reportReportedUser}
+		order by tried_comment_time desc
+	</select>
+	
+	<!-- 3-6. 피신고자 여행친구 리스트 조회 -->
+	<select id="selectAccList" resultType="project.dto.AccompanyDto">
+		select acc.accompany_idx, acc.accompany_title, acc.accompany_content, acc.accompany_created_time from report r
+		inner join accompany acc
+		on r.report_reported_user = acc.user_id
+		where r.report_reported_user = #{reportReportedUser}
+		and acc.accompany_deleted = 'N'
+		order by accompany_created_time desc
+	</select>
+	
+	<!-- 3-7. 피신고자 이상과현실 리스트 조회 -->
+	<select id="selectIRList" resultType="project.dto.IdealrealDto">
+		select ir.idealreal_idx, ir.idealreal_title, ir.idealreal_content, ir.idealreal_created_time from report r
+		inner join idealreal ir
+		on r.report_reported_user = ir.user_id
+		where r.report_reported_user = #{reportReportedUser}
+		and ir.idealreal_deleted = 'N'
+		order by idealreal_created_time desc
+	</select>
+	
+	<!-- 3-8. 피신고자 채팅 리스트 조회 -->
+	<select id="selectChatList" resultType="project.dto.ChatDto">
+		select c.chat_idx, c.message, c.created_dt, c.type from report r
+		inner join chat c
+		on r.report_reported_user = c.user_id
+		where r.report_reported_user = #{reportReportedUser}
+		and c.type='CHAT'
+		order by created_dt desc;
+	</select>
+	
+	<!-- 4. 피신고자 정지기한 입력 -->
+	<update id="selectReportedSuspension" parameterType="project.dto.UserDto">
+		update user 
+		set user_suspension = #{userSuspension}
+		where user_id = #{userId}
+	</update>
+	
+	
+	
+	
+
+</mapper>

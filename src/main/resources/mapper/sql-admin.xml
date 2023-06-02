@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.mapper.AdminMapper">
+
+	<!-- 1-1. 여행코스 일자별 게시글 개수 조회 -->
+	<select id="selectTravelcourseDayPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, date(travelcourse_createdtime) as day from travelcourse
+		where date(travelcourse_createdtime) between #{startDay} and #{endDay}
+		group by date(travelcourse_createdtime)
+	</select>
+	
+	<!-- 1-2. 어디까지 일자별 게시글 개수 조회 -->
+	<select id="selectTriedDayPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, date(tried_created_time) as day from tried
+		where date(tried_created_time) between #{startDay} and #{endDay}
+		group by date(tried_created_time)
+	</select>
+	
+	<!-- 1-3. 여행친구 일자별 게시글 개수 조회 -->
+	<select id="selectAccompanyDayPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, date(accompany_created_time) as day from accompany
+		where date(accompany_created_time) between #{startDay} and #{endDay}
+		group by date(accompany_created_time)
+	</select>
+	
+	<!-- 1-4. 이상현실 일자별 게시글 개수 조회 -->
+	<select id="selectIdealrealDayPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, date(idealreal_created_time) as day from idealreal
+		where date(idealreal_created_time) between #{startDay} and #{endDay}
+		group by date(idealreal_created_time)
+	</select>
+	
+	<!-- 2-1. 여행코스 월별 게시글 개수 조회 -->
+	<select id="selectTravelcourseMonthPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, month(travelcourse_createdtime) as month from travelcourse
+		where year(travelcourse_createdtime) = #{year}
+		group by month
+	</select>
+	
+	<!-- 2-2. 어디까지 월별 게시글 개수 조회 -->
+	<select id="selectTriedMonthPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, month(tried_created_time) as month from tried
+		where year(tried_created_time) = #{year}
+		group by month
+	</select>
+	
+	<!-- 2-3. 여행친구 월별 게시글 개수 조회 -->
+	<select id="selectAccompanyMonthPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, month(accompany_created_time) as month from accompany
+		where year(accompany_created_time) = #{year}
+		group by month
+	</select>
+	
+	<!-- 2-4. 이상현실 월별 게시글 개수 조회 -->
+	<select id="selectIdealrealMonthPostCount" resultType="project.dto.AdminDto">
+		select count(*) as count, month(idealreal_created_time) as month from idealreal
+		where year(idealreal_created_time) = #{year}
+		group by month
+	</select>
+	
+</mapper>

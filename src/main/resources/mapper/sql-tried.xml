@@ -10,6 +10,8 @@
 		select * from tried t
 		inner join user u
 		on t.user_id = u.user_id
+		left outer join (select tried_idx, count(*) as tried_rcmd from tried_rcmd group by tried_idx) as r
+        on t.tried_idx = r.tried_idx
 		where tried_category_idx=#{triedCategoryIdx}
 		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
 		and tried_deleted='N'
@@ -33,6 +35,8 @@
 		select * from tried t
 		inner join user u
 		on t.user_id = u.user_id
+		left outer join (select tried_idx, count(*) as tried_rcmd from tried_rcmd group by tried_idx) as r
+        on t.tried_idx = r.tried_idx
 		where tried_category_idx=#{triedCategoryIdx}
 		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
 		and tried_deleted='N'
@@ -56,6 +60,8 @@
 		select * from tried t
 		inner join user u
 		on t.user_id = u.user_id
+		left outer join (select tried_idx, count(*) as tried_rcmd from tried_rcmd group by tried_idx) as r
+        on t.tried_idx = r.tried_idx
 		where tried_category_idx=#{triedCategoryIdx}
 		and tried_created_time >= #{syear, jdbcType=DATE} and tried_created_time <= #{lyear, jdbcType=DATE}
 		and tried_deleted='N'
@@ -65,12 +71,16 @@
 
 	<!-- 1-3.어디까지 상세페이지 조회 -->
 	<select id="selectTriedDetail" parameterType="int" resultType="project.dto.TriedDto">
-		select tried_idx, user_id, tried_title, tried_content,
-		tried_img,
-		date_format(tried_created_time, '%Y-%m-%d %H:%i:%s') as tried_created_time,
-		tried_cnt, tried_rcmd, tried_deleted
-		from tried
-		where tried_deleted = 'N' and tried_idx = #{triedIdx}
+		select t.tried_idx, t.user_id, t.tried_title, t.tried_content,
+		t.tried_img,
+		date_format(t.tried_created_time, '%Y-%m-%d %H:%i:%s') as tried_created_time,
+		t.tried_cnt, t.tried_deleted, u.user_nickname, r.tried_rcmd
+		from tried t
+		inner join user u
+        on t.user_id = u.user_id
+        left outer join (select tried_idx, count(*) as tried_rcmd from tried_rcmd group by tried_idx) as r
+        on t.tried_idx = r.tried_idx
+		where tried_deleted = 'N' and t.tried_idx = #{triedIdx}
 	</select>
 
 	<!-- 1-3-1. 어디까지 '조회수' -->
@@ -106,10 +116,34 @@
 		where tried_idx = #{triedIdx}
 	</delete>
 	
+	<!-- 5-1. 어디까지 댓글 조회 -->
+	<select id="selectTriedComment" parameterType="int" resultType="project.dto.TriedCommentDto">
+		select tc.tried_comment_idx, tc.tried_comment_Content, tc.tried_idx, tc.tried_comment_time,
+		u.user_id, u.user_nickname, u.user_img from tried_comment tc
+		inner join user u
+		on tc.user_id = u.user_id
+		where tc.tried_idx = #{triedIdx}
+	</select>
 	
+	<!-- 5-2. 어디까지 댓글 입력 -->
+	<insert id="insertTriedComment" parameterType="project.dto.TriedCommentDto">
+		insert into tried_comment
+		(tried_comment_content, tried_idx, user_id)
+		values (#{triedCommentContent}, #{triedIdx}, #{userId})
+	</insert>
 	
+	<!-- 5-3. 어디까지 댓글 수정 -->
+	<update id="updateTriedComment" parameterType="project.dto.TriedCommentDto">
+		update tried_comment
+		set tried_comment_content = #{triedCommentContent}
+		where tried_comment_idx = #{triedCommentIdx}
+	</update>
 	
-	
+	<!-- 5-4. 어디까지 댓글 삭제 -->
+	<delete id="deleteTriedComment" parameterType="int">
+		delete from tried_comment
+		where tried_comment_idx = #{triedCommentIdx}
+	</delete>
 	
 	<!-- 어디까지 이미지 업로드(삭제예정) -->
 	<insert id="uploadTried">
@@ -128,4 +162,34 @@
 		where tried_deleted = 'N'
 		order by tried_idx desc
 	</select>
+	
+	<!-- 6-1. 어디까지 게시글 유저 추천 확인  -->
+	<select id="selectTriedRcmdByUserId" parameterType="project.dto.TriedRcmdDto" resultType="int">
+		select count(*) from tried_rcmd
+		where user_id = #{userId}
+        and tried_idx = #{triedIdx};
+	</select>
+	
+	<!-- 6-2. 어디까지 게시글 추천 추가 -->
+	<insert id="insertTriedRcmd" parameterType="project.dto.TriedRcmdDto">
+		insert into tried_rcmd (user_id, tried_idx )
+		values ( #{userId}, #{triedIdx} )
+	</insert>
+	
+	<!-- 6-3. 어디까지 게시글 추천 삭제 -->
+	<delete id="deleteTriedRcmd" parameterType="project.dto.TriedRcmdDto">
+		delete from tried_rcmd
+        where tried_idx = #{triedIdx}
+        and user_id = #{userId}
+	</delete>
+	
+	<!-- 6-4. 어디까지 게시글 추천수 조회 -->
+	<select id="selectTriedRcmdCount" parameterType="int"
+		resultType="int">
+		SELECT IFNULL(t.count, 0) as count
+		FROM (SELECT COUNT(*) as count
+      	FROM tried_rcmd
+      	WHERE tried_idx = #{triedIdx}) t;
+	</select>
+	
 </mapper>

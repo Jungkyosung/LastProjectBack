@@ -3,6 +3,7 @@ package project.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import project.dto.UserDto;
 
@@ -15,4 +16,5 @@ public interface LoginMapper {
 	public String idDuplicateCheck(String userId) throws Exception;
 	public String nicknameDuplicateCheck(String userNickname) throws Exception;
 	public List<UserDto> googlelogin(String userId) throws Exception;
+	public int selectSuspensionByUser(@Param("userId") String userId) throws Exception;
 }
