@@ -31,19 +31,23 @@
 
 	<!-- QNA 상세페이지 COMMENT 리스트 -->
 	<select id="selectCommentList" resultType="project.dto.QnaCommentDto" parameterType="int">
-		select qna_comment_idx, user_id, qna_comment_content, qna_idx,
-		       date_format(qna_comment_time, '%Y.%m.%d %H:%i:%s' )
-		    as qna_comment_time
-		  from qna_comment
-		 where qna_idx=#{qnaIdx}
+		 select q.qna_comment_idx, q.user_id, q.qna_comment_content, q.qna_idx,
+		       date_format(q.qna_comment_time, '%Y.%m.%d %H:%i:%s' )
+		    as qna_comment_time, u.user_nickname
+		  from qna_comment q
+          inner join user u
+          on q.user_id = u.user_id
+		 where qna_idx=#{qnaIdx};
 	</select>
 
 	<!-- QNA 상세페이지 조회 -->
 	<select id="selectQnaInfo" parameterType="int" resultType="project.dto.QnaDto">
-		select qna_idx, qna_title, qna_content, user_id,
-		       date_format(qna_created_time, '%Y.%m.%d' ) as qna_created_time
-		  from qna
-		 where qna_deleted = 'N' and qna_idx=#{qnaIdx}
+		 select q.qna_idx, q.qna_title, q.qna_content, q.user_id,
+		       date_format(q.qna_created_time, '%Y.%m.%d' ) as qna_created_time,  u.user_nickname
+		  from qna q
+          inner join user u
+          on q.user_id = u.user_id
+		 where qna_deleted = 'N' and qna_idx=#{qnaIdx};
 	</select>
 
 	<!-- QNA 상세페이지 COMMENT 등록 -->
@@ -51,23 +55,23 @@
 		insert into 
 			qna_comment (qna_comment_content, qna_comment_time, qna_idx, user_id)
 		values
-			(#{qnaCommentContent}, now(), #{qnaIdx}, 'lsy00812@gmail.com')
+			(#{qnaCommentContent}, now(), #{qnaIdx}, #{userId})
 
 	</insert>
 
 
 	<!-- QNA 검색 -->
 	<select id="listQnaDtoByPages" resultType="project.dto.QnaDto">
-		select * 
-		  from ( select qna_idx, qna_title, user_id, qna_content,
-		                date_format(qna_created_time, '%Y.%m.%d' ) as qna_created_time
-		           from qna
+
+		select q.qna_idx, q.qna_title, q.user_id, q.qna_content,
+		date_format(q.qna_created_time, '%Y.%m.%d' ) as qna_created_time, u.user_nickname
+		from qna q
+		inner join user u
+		on q.user_id = u.user_id
 		          where qna_title like concat('%',#{search},'%' )
 		             or qna_content like concat('%',#{search},'%' )
-		       order by qna_idx desc )
-		    as qna_page
-		limit 10
-		offset #{pages}
+		       order by qna_idx desc
+               limit #{pages}, 10
 	</select>
 
 	<!-- QNA 검색 페이지 수 조회 -->

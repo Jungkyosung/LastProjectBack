@@ -99,7 +99,7 @@
 	
 	<!-- 1-2(4). 이미지 조회 -->
 	<select id="selectTravelcourseImg" resultType="project.dto.TravelcourseImgDto">
-		select 	tc.travelcourse_idx, tci.travelcourse_img
+		select 	tc.travelcourse_idx, max(tci.travelcourse_img)
 		from travelcourse tc
         left join travelcourse_img tci
         on tc.travelcourse_idx = tci.travelcourse_idx

@@ -13,4 +13,5 @@ public class QnaDto {
 	String qnaCreatedTime;	//작성일
 	String qnaDeleted;		//삭제여부
 	String userId;			//유저아이디(외래키)
+	String userNickname;	//유저 닉네임(조인)
 }

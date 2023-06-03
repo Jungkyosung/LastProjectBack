@@ -11,4 +11,5 @@ public class QnaCommentDto {
 	String qnaCommentTime;		//작성일
 	int qnaIdx;					//문의사항인덱스(외래키)
 	String userId;				//유저아이디(외래키)
+	String userNickname;		//우저닉네임(조인)
 }
